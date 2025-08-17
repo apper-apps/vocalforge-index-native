@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from "react";
-import { useAudioEngine } from "./useAudioEngine";
+import { useCallback, useRef, useState } from "react";
+import useAudioEngine from "@/hooks/useAudioEngine";
 
 export const useAudioRecorder = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -14,8 +14,7 @@ export const useAudioRecorder = () => {
   const animationFrameRef = useRef(null);
   const timerRef = useRef(null);
 
-  const { audioContext, createAnalyzer } = useAudioEngine();
-
+  const { audioContext, createAnalyzer, resumeAudioContext, needsUserInteraction } = useAudioEngine();
   // Start level monitoring
   const startLevelMonitoring = useCallback((stream) => {
     if (!audioContext) return;
@@ -63,9 +62,18 @@ export const useAudioRecorder = () => {
   }, []);
 
   // Start recording
-  const startRecording = useCallback(async (options = {}) => {
+const startRecording = useCallback(async (options = {}) => {
     try {
       setError(null);
+
+      // Ensure audio context is ready (requires user interaction)
+      if (needsUserInteraction) {
+        await resumeAudioContext();
+      }
+
+      if (!audioContext) {
+        throw new Error('Audio context not initialized');
+      }
 
       // Get user media
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -87,6 +95,18 @@ export const useAudioRecorder = () => {
       });
 
       mediaRecorderRef.current = mediaRecorder;
+      
+      // Initialize chunks array for proper data collection
+      const recordedChunks = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          recordedChunks.push(event.data);
+        }
+      };
+
+      // Store chunks reference for stopRecording
+      mediaRecorderRef.current.recordedChunks = recordedChunks;
 
       // Start level monitoring
       startLevelMonitoring(stream);
@@ -98,35 +118,30 @@ export const useAudioRecorder = () => {
       }, 100);
 
       // Start recording
-      const chunks = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunks.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: mediaRecorder.mimeType });
-        return blob;
-      };
-
       mediaRecorder.start(100); // Collect data every 100ms
       setIsRecording(true);
 
       return mediaRecorder;
 
     } catch (err) {
-      setError(`Failed to start recording: ${err.message}`);
+      const errorMessage = err.name === 'NotAllowedError' 
+        ? 'Microphone access denied. Please allow microphone access and try again.'
+        : `Failed to start recording: ${err.message}`;
+      setError(errorMessage);
       throw err;
     }
-  }, [startLevelMonitoring]);
+  }, [startLevelMonitoring, audioContext, needsUserInteraction, resumeAudioContext]);
 
   // Stop recording
-  const stopRecording = useCallback(() => {
+const stopRecording = useCallback(() => {
     return new Promise((resolve, reject) => {
       if (!mediaRecorderRef.current) {
         reject(new Error("No recording in progress"));
+        return;
+      }
+
+      if (!audioContext) {
+        reject(new Error("Audio context not available"));
         return;
       }
 
@@ -149,43 +164,67 @@ export const useAudioRecorder = () => {
             streamRef.current = null;
           }
 
-          // Get recorded data
-          const chunks = [];
-          const reader = new FileReader();
+          // Get recorded data from collected chunks
+          const recordedChunks = mediaRecorder.recordedChunks || [];
           
-          reader.onload = async () => {
-            try {
-              const arrayBuffer = reader.result;
-              const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-              
-              setIsRecording(false);
-              setRecordingTime(0);
-              
-              resolve({
-                audioBuffer,
-                arrayBuffer,
-                duration: audioBuffer.duration,
-                sampleRate: audioBuffer.sampleRate,
-                numberOfChannels: audioBuffer.numberOfChannels
-              });
-            } catch (err) {
-              reject(new Error(`Failed to process recording: ${err.message}`));
-            }
-          };
+          if (recordedChunks.length === 0) {
+            reject(new Error("No audio data recorded"));
+            return;
+          }
 
-          // This is a simplified version - in reality, you'd collect the chunks from ondataavailable
-          const blob = new Blob([], { type: "audio/webm" });
-          reader.readAsArrayBuffer(blob);
+          const blob = new Blob(recordedChunks, { 
+            type: mediaRecorder.mimeType || "audio/webm"
+          });
+
+          // Convert blob to array buffer
+          const arrayBuffer = await blob.arrayBuffer();
+          
+          try {
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice());
+            
+            setIsRecording(false);
+            setRecordingTime(0);
+            
+            resolve({
+              audioBuffer,
+              arrayBuffer,
+              blob,
+              duration: audioBuffer.duration,
+              sampleRate: audioBuffer.sampleRate,
+              numberOfChannels: audioBuffer.numberOfChannels
+            });
+          } catch (decodeError) {
+            // If decoding fails, still return the raw data
+            setIsRecording(false);
+            setRecordingTime(0);
+            
+            resolve({
+              audioBuffer: null,
+              arrayBuffer,
+              blob,
+              duration: 0,
+              sampleRate: 44100,
+              numberOfChannels: 1,
+              decodeError: decodeError.message
+            });
+          }
 
         } catch (err) {
-          reject(err);
+          setIsRecording(false);
+          setRecordingTime(0);
+          reject(new Error(`Failed to process recording: ${err.message}`));
         }
+      };
+
+      mediaRecorder.onerror = (event) => {
+        setIsRecording(false);
+        setRecordingTime(0);
+        reject(new Error(`Recording failed: ${event.error?.message || 'Unknown error'}`));
       };
 
       mediaRecorder.stop();
     });
   }, [audioContext, stopLevelMonitoring]);
-
   // Cleanup
   const cleanup = useCallback(() => {
     if (isRecording) {

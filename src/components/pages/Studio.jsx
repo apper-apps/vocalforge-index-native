@@ -1,18 +1,19 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
+import useAudioRecorder from "@/hooks/useAudioRecorder";
+import ApperIcon from "@/components/ApperIcon";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import LevelMeter from "@/components/molecules/LevelMeter";
 import WaveformDisplay from "@/components/molecules/WaveformDisplay";
 import TransportControls from "@/components/molecules/TransportControls";
+import ExportPanel from "@/components/organisms/ExportPanel";
 import RecordingPanel from "@/components/organisms/RecordingPanel";
 import AutotunePanel from "@/components/organisms/AutotunePanel";
 import MasteringPanel from "@/components/organisms/MasteringPanel";
-import ExportPanel from "@/components/organisms/ExportPanel";
-import LevelMeter from "@/components/molecules/LevelMeter";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
-import Empty from "@/components/ui/Empty";
 import Button from "@/components/atoms/Button";
-import ApperIcon from "@/components/ApperIcon";
 
 const Studio = () => {
   // Audio state
@@ -32,35 +33,17 @@ const Studio = () => {
   const [outputLevel, setOutputLevel] = useState(0);
   const [outputPeak, setOutputPeak] = useState(0);
   
-  // Settings
+// Settings
   const [autotuneSettings, setAutotuneSettings] = useState({});
   const [masteringSettings, setMasteringSettings] = useState({});
-  const [projectName, setProjectName] = useState("Untitled Project");
-
-  // Audio context for playback
-  const [audioContext, setAudioContext] = useState(null);
+  // Audio state for playback
   const [audioSource, setAudioSource] = useState(null);
+  // Project state
+  const [projectName, setProjectName] = useState("New Project");
 
-  // Initialize audio context
-  useEffect(() => {
-    const initAudio = async () => {
-      try {
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        setAudioContext(context);
-      } catch (err) {
-        setError("Failed to initialize audio system");
-      }
-    };
-    
-    initAudio();
-    
-    return () => {
-      if (audioContext && audioContext.state !== "closed") {
-        audioContext.close();
-      }
-    };
-  }, []);
-
+  // Recording management
+  const recorder = useAudioRecorder();
+  
   // Handle recording completion
   const handleRecordingComplete = (buffer) => {
     setAudioBuffer(buffer);

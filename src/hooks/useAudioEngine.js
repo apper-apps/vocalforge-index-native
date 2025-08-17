@@ -4,35 +4,76 @@ export const useAudioEngine = () => {
   const [audioContext, setAudioContext] = useState(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState(null);
+  const [needsUserInteraction, setNeedsUserInteraction] = useState(true);
   const audioContextRef = useRef(null);
 
-  // Initialize audio context
+  // Initialize audio context (requires user gesture)
   const initializeAudioContext = useCallback(async () => {
     try {
+      setError(null);
+      
+      // Check if we already have a context
+      if (audioContextRef.current && audioContextRef.current.state !== "closed") {
+        if (audioContextRef.current.state === "suspended") {
+          await audioContextRef.current.resume();
+        }
+        setAudioContext(audioContextRef.current);
+        setIsInitialized(true);
+        setNeedsUserInteraction(false);
+        return audioContextRef.current;
+      }
+
       const context = new (window.AudioContext || window.webkitAudioContext)({
         sampleRate: 44100,
         latencyHint: "interactive"
       });
       
+      // Handle suspended state (requires user interaction)
       if (context.state === "suspended") {
-        await context.resume();
+        setNeedsUserInteraction(true);
+        // Don't resume here - wait for user interaction
       }
       
       audioContextRef.current = context;
       setAudioContext(context);
-      setIsInitialized(true);
-      setError(null);
+      setIsInitialized(context.state === "running");
+      setNeedsUserInteraction(context.state === "suspended");
       
       return context;
     } catch (err) {
-      setError(`Failed to initialize audio: ${err.message}`);
+      const errorMessage = err.name === 'NotAllowedError' 
+        ? 'Microphone access denied. Please allow microphone access and try again.'
+        : `Failed to initialize audio: ${err.message}`;
+      setError(errorMessage);
       return null;
     }
   }, []);
 
-  // Get user media for recording
+  // Resume audio context after user interaction
+  const resumeAudioContext = useCallback(async () => {
+    if (audioContextRef.current && audioContextRef.current.state === "suspended") {
+      try {
+        await audioContextRef.current.resume();
+        setIsInitialized(true);
+        setNeedsUserInteraction(false);
+        setError(null);
+        return true;
+      } catch (err) {
+        setError(`Failed to resume audio: ${err.message}`);
+        return false;
+      }
+    }
+    return true;
+  }, []);
+
+// Get user media for recording
   const getUserMedia = useCallback(async (constraints = { audio: true }) => {
     try {
+      // Ensure audio context is ready first
+      if (needsUserInteraction && audioContextRef.current?.state === "suspended") {
+        await resumeAudioContext();
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -44,10 +85,15 @@ export const useAudioEngine = () => {
       });
       return stream;
     } catch (err) {
-      setError(`Microphone access denied: ${err.message}`);
+      const errorMessage = err.name === 'NotAllowedError' 
+        ? 'Microphone access denied. Please allow microphone access in your browser settings.'
+        : err.name === 'NotFoundError'
+        ? 'No microphone found. Please connect a microphone and try again.'
+        : `Microphone error: ${err.message}`;
+      setError(errorMessage);
       throw err;
     }
-  }, []);
+  }, [needsUserInteraction, resumeAudioContext]);
 
   // Create audio buffer from array buffer
   const createAudioBuffer = useCallback(async (arrayBuffer) => {
@@ -135,7 +181,7 @@ export const useAudioEngine = () => {
     setIsInitialized(false);
   }, []);
 
-  // Initialize on mount
+// Initialize on mount (but don't resume until user interaction)
   useEffect(() => {
     initializeAudioContext();
     
@@ -146,7 +192,9 @@ export const useAudioEngine = () => {
     audioContext,
     isInitialized,
     error,
+    needsUserInteraction,
     initializeAudioContext,
+    resumeAudioContext,
     getUserMedia,
     createAudioBuffer,
     createBufferSource,
