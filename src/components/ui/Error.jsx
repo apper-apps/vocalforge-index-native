@@ -2,6 +2,15 @@ import { motion } from "framer-motion";
 import ApperIcon from "@/components/ApperIcon";
 
 const Error = ({ message = "Something went wrong", onRetry, showRetry = true }) => {
+  // Enhanced error message handling for audio permissions
+  const isPermissionError = message?.toLowerCase().includes('permission') || 
+                           message?.toLowerCase().includes('denied') ||
+                           message?.toLowerCase().includes('access');
+
+  const displayMessage = isPermissionError 
+    ? "Microphone access is required to use VocalForge's recording features."
+    : message;
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}

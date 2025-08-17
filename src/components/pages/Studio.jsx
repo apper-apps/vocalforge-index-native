@@ -32,8 +32,42 @@ const Studio = () => {
   const [selection, setSelection] = useState(null);
   const [outputLevel, setOutputLevel] = useState(0);
   const [outputPeak, setOutputPeak] = useState(0);
+const [outputPeak, setOutputPeak] = useState(0);
   
-// Settings
+  // Settings
+  const [isInitialized, setIsInitialized] = useState(false);
+  // Initialize audio system
+  useEffect(() => {
+    const initializeAudio = async () => {
+      try {
+        setError(null);
+        // Test microphone permissions early
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => track.stop()); // Clean up test stream
+        setIsInitialized(true);
+      } catch (err) {
+        const errorMessage = err.name === 'NotAllowedError' 
+          ? 'Microphone access denied. Please allow microphone access to use VocalForge.'
+          : `Audio initialization failed: ${err.message}`;
+        setError(errorMessage);
+      }
+    };
+
+    initializeAudio();
+  }, []);
+
+  // Retry handler
+  const handleRetry = () => {
+    setError(null);
+    setIsInitialized(false);
+    // Re-trigger initialization
+    window.location.reload();
+  };
+
+  // Show error screen if there's a critical error
+  if (error) {
+    return <Error message={error} onRetry={handleRetry} />;
+  }
   const [autotuneSettings, setAutotuneSettings] = useState({});
   const [masteringSettings, setMasteringSettings] = useState({});
   // Audio state for playback
@@ -134,20 +168,10 @@ const Studio = () => {
   if (isLoading) {
     return <Loading />;
   }
-
-  // Show error state
-  if (error) {
-    return (
-      <Error 
-        message={error} 
-        onRetry={() => {
-          setError(null);
-          window.location.reload();
-        }} 
-      />
-    );
+// Show loading state during initialization
+  if (!isInitialized) {
+    return <Loading />;
   }
-
   return (
     <div className="min-h-screen bg-surface-900 flex flex-col">
       {/* Header */}

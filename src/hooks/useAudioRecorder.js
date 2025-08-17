@@ -252,8 +252,10 @@ const stopRecording = useCallback(() => {
     error,
     startRecording,
     stopRecording,
-    cleanup
+cleanup
   };
 };
+
+export default useAudioRecorder;
 
 export default useAudioRecorder;
