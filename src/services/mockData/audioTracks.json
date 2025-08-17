@@ -1,0 +1,137 @@
+[
+  {
+    "Id": 1,
+    "projectId": 1,
+    "name": "Lead Vocal",
+    "audioBuffer": null,
+    "waveformData": null,
+    "duration": 180.5,
+    "settings": {
+      "autotune": {
+        "enabled": true,
+        "key": "C",
+        "scale": "major",
+        "correctionStrength": 75,
+        "referencePitch": 440
+      },
+      "mastering": {
+        "eqLow": 2,
+        "eqMid": 1,
+        "eqHigh": 3,
+        "compThreshold": -18,
+        "compRatio": 4,
+        "limiterThreshold": -1
+      }
+    },
+    "createdAt": "2024-01-15T10:30:00.000Z"
+  },
+  {
+    "Id": 2,
+    "projectId": 1,
+    "name": "Harmony Layer",
+    "audioBuffer": null,
+    "waveformData": null,
+    "duration": 180.5,
+    "settings": {
+      "autotune": {
+        "enabled": true,
+        "key": "C",
+        "scale": "major",
+        "correctionStrength": 50,
+        "referencePitch": 440
+      }
+    },
+    "createdAt": "2024-01-15T10:35:00.000Z"
+  },
+  {
+    "Id": 3,
+    "projectId": 2,
+    "name": "Main Vocal",
+    "audioBuffer": null,
+    "waveformData": null,
+    "duration": 203.2,
+    "settings": {
+      "mastering": {
+        "eqLow": 0,
+        "eqMid": 2,
+        "eqHigh": 1,
+        "compThreshold": -15,
+        "compRatio": 6,
+        "limiterThreshold": -0.5
+      }
+    },
+    "createdAt": "2024-01-14T14:20:00.000Z"
+  },
+  {
+    "Id": 4,
+    "projectId": 3,
+    "name": "Vocal Practice",
+    "audioBuffer": null,
+    "waveformData": null,
+    "duration": 95.8,
+    "settings": {
+      "autotune": {
+        "enabled": true,
+        "key": "Am",
+        "scale": "minor",
+        "correctionStrength": 25,
+        "referencePitch": 440
+      }
+    },
+    "createdAt": "2024-01-13T09:15:00.000Z"
+  },
+  {
+    "Id": 5,
+    "projectId": 4,
+    "name": "Cover Vocal",
+    "audioBuffer": null,
+    "waveformData": null,
+    "duration": 245.7,
+    "settings": {
+      "autotune": {
+        "enabled": true,
+        "key": "F#",
+        "scale": "major",
+        "correctionStrength": 85,
+        "referencePitch": 440
+      },
+      "mastering": {
+        "eqLow": -1,
+        "eqMid": 3,
+        "eqHigh": 2,
+        "compThreshold": -20,
+        "compRatio": 3,
+        "limiterThreshold": -1.5
+      }
+    },
+    "createdAt": "2024-01-12T16:00:00.000Z"
+  },
+  {
+    "Id": 6,
+    "projectId": 4,
+    "name": "Background Vocals",
+    "audioBuffer": null,
+    "waveformData": null,
+    "duration": 245.7,
+    "settings": {
+      "autotune": {
+        "enabled": true,
+        "key": "F#",
+        "scale": "major",
+        "correctionStrength": 60,
+        "referencePitch": 440
+      }
+    },
+    "createdAt": "2024-01-12T16:30:00.000Z"
+  },
+  {
+    "Id": 7,
+    "projectId": 5,
+    "name": "Experimental Track",
+    "audioBuffer": null,
+    "waveformData": null,
+    "duration": 156.3,
+    "settings": {},
+    "createdAt": "2024-01-11T13:45:00.000Z"
+  }
+]

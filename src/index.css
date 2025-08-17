@@ -1,0 +1,115 @@
+@import 'react-toastify/dist/ReactToastify.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Toast Styling */
+.Toastify__toast-container {
+  top: 1rem !important;
+  right: 1rem !important;
+  width: 380px !important;
+  z-index: 9999 !important;
+}
+
+.Toastify__toast {
+  background: rgba(31, 41, 55, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(124, 58, 237, 0.3) !important;
+  border-radius: 8px !important;
+  color: #F9FAFB !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+}
+
+.Toastify__progress-bar {
+  background: linear-gradient(90deg, #7C3AED, #EC4899) !important;
+}
+
+/* Base Styling */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #111827;
+  color: #F9FAFB;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 58, 237, 0.8);
+}
+
+/* Waveform Canvas */
+.waveform-canvas {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Knob Styling */
+.knob {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.knob:hover {
+  filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.5));
+}
+
+/* Level Meter Styling */
+.level-meter {
+  background: linear-gradient(to top, 
+    #10B981 0%, 
+    #10B981 60%, 
+    #F59E0B 80%, 
+    #EF4444 100%);
+}
+
+/* Glow Effects */
+.btn-glow:hover {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.6);
+}
+
+.recording-glow {
+  animation: pulse-glow 1s ease-in-out infinite;
+}
+
+/* Selection Highlight */
+.waveform-selection {
+  background: rgba(236, 72, 153, 0.3);
+  border: 1px solid rgba(236, 72, 153, 0.6);
+}
+
+/* Transport Controls */
+.transport-btn {
+  transition: all 0.2s ease;
+}
+
+.transport-btn:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 15px rgba(124, 58, 237, 0.7));
+}
+
+.transport-btn:active {
+  transform: scale(0.95);
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #7C3AED, #EC4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

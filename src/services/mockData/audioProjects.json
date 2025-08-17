@@ -1,0 +1,67 @@
+[
+  {
+    "Id": 1,
+    "name": "My First Recording",
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "updatedAt": "2024-01-15T11:45:00.000Z",
+    "tempo": 120,
+    "key": "C",
+    "duration": 180.5,
+    "settings": {
+      "autotuneEnabled": true,
+      "masteringEnabled": true
+    }
+  },
+  {
+    "Id": 2,
+    "name": "Vocal Demo Take 2",
+    "createdAt": "2024-01-14T14:20:00.000Z",
+    "updatedAt": "2024-01-14T15:10:00.000Z",
+    "tempo": 95,
+    "key": "G",
+    "duration": 203.2,
+    "settings": {
+      "autotuneEnabled": false,
+      "masteringEnabled": true
+    }
+  },
+  {
+    "Id": 3,
+    "name": "Practice Session",
+    "createdAt": "2024-01-13T09:15:00.000Z",
+    "updatedAt": "2024-01-13T09:45:00.000Z",
+    "tempo": 110,
+    "key": "Am",
+    "duration": 95.8,
+    "settings": {
+      "autotuneEnabled": true,
+      "masteringEnabled": false
+    }
+  },
+  {
+    "Id": 4,
+    "name": "Cover Song Attempt",
+    "createdAt": "2024-01-12T16:00:00.000Z",
+    "updatedAt": "2024-01-12T17:30:00.000Z",
+    "tempo": 128,
+    "key": "F#",
+    "duration": 245.7,
+    "settings": {
+      "autotuneEnabled": true,
+      "masteringEnabled": true
+    }
+  },
+  {
+    "Id": 5,
+    "name": "Experimental Sounds",
+    "createdAt": "2024-01-11T13:45:00.000Z",
+    "updatedAt": "2024-01-11T14:20:00.000Z",
+    "tempo": 140,
+    "key": "Bb",
+    "duration": 156.3,
+    "settings": {
+      "autotuneEnabled": false,
+      "masteringEnabled": false
+    }
+  }
+]
