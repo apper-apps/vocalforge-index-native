@@ -63,10 +63,7 @@ const [outputLevel, setOutputLevel] = useState(0);
     window.location.reload();
   };
 
-  // Show error screen if there's a critical error
-  if (error) {
-    return <Error message={error} onRetry={handleRetry} />;
-  }
+// Hook calls must be at top level, before any conditional logic
   const [autotuneSettings, setAutotuneSettings] = useState({});
   const [masteringSettings, setMasteringSettings] = useState({});
   // Audio state for playback
@@ -76,6 +73,11 @@ const [outputLevel, setOutputLevel] = useState(0);
 
   // Recording management
   const recorder = useAudioRecorder();
+
+  // Show error screen if there's a critical error
+  if (error) {
+    return <Error message={error} onRetry={handleRetry} />;
+  }
   
   // Handle recording completion
   const handleRecordingComplete = (buffer) => {
