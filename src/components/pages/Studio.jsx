@@ -30,9 +30,8 @@ const Studio = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selection, setSelection] = useState(null);
-  const [outputLevel, setOutputLevel] = useState(0);
+const [outputLevel, setOutputLevel] = useState(0);
   const [outputPeak, setOutputPeak] = useState(0);
-const [outputPeak, setOutputPeak] = useState(0);
   
   // Settings
   const [isInitialized, setIsInitialized] = useState(false);

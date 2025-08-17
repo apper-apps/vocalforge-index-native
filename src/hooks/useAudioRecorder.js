@@ -257,5 +257,3 @@ cleanup
 };
 
 export default useAudioRecorder;
-
-export default useAudioRecorder;
